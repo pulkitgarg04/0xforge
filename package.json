@@ -1,0 +1,38 @@
+{
+  "name": "0xforge",
+  "version": "1.0.0",
+  "description": "Competitive Programming IDE with AI assistance, Codeforces integration, stress testing, and multi-language code execution",
+  "keywords": [
+    "competitive-programming",
+    "ide",
+    "codeforces",
+    "leetcode",
+    "cpp",
+    "algorithm",
+    "electron",
+    "stress-test",
+    "ai"
+  ],
+  "homepage": "https://github.com/pulkitgarg04/0xforge#readme",
+  "bugs": {
+    "url": "https://github.com/pulkitgarg04/0xforge/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pulkitgarg04/0xforge.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Pulkit Garg",
+    "url": "https://github.com/pulkitgarg04"
+  },
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "electron": "^40.8.0"
+  }
+}
