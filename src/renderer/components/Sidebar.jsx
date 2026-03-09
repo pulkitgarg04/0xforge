@@ -1,12 +1,12 @@
 import Icon from './Icon';
-import { icons } from '../constants';
+import * as GeneralIcons from './icons/generalIcons';
 
-export default function Sidebar({ active, onSelect }) {
+export default function Sidebar({ active, onSelect, onOpenFolder }) {
     const items = [
-        { key: 'files', icon: icons.files, label: 'Explorer' },
-        { key: 'search', icon: icons.search, label: 'Search' },
-        { key: 'testing', icon: icons.flask, label: 'Test Cases' },
-        { key: 'terminal', icon: icons.terminal, label: 'Terminal' },
+        { key: 'files', icon: GeneralIcons.files, label: 'Explorer' },
+        { key: 'search', icon: GeneralIcons.search, label: 'Search' },
+        { key: 'testing', icon: GeneralIcons.flask, label: 'Test Cases' },
+        { key: 'terminal', icon: GeneralIcons.terminal, label: 'Terminal' },
     ];
 
     return (
@@ -22,6 +22,11 @@ export default function Sidebar({ active, onSelect }) {
             ))}
 
             <div className="flex-1" />
+
+            <button title="Open Folder" onClick={onOpenFolder}
+                className="w-[38px] h-[38px] flex items-center justify-center rounded-lg text-forge-text-muted hover:text-forge-text hover:bg-forge-surface-hover transition-all duration-150 cursor-pointer">
+                <Icon d={GeneralIcons.folder} size={18} />
+            </button>
 
             <button title="Settings"
                 className="w-[38px] h-[38px] flex items-center justify-center rounded-lg text-forge-text-muted hover:text-forge-text hover:bg-forge-surface-hover transition-all duration-150 cursor-pointer">

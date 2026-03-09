@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Icon from './Icon';
-import { icons, sampleTestCases } from '../constants';
+import { sampleTestCases } from '../constants';
+import * as GeneralIcons from './icons/generalIcons';
 
 export default function TestPanel() {
     const [activeTest, setActiveTest] = useState(1);
@@ -28,7 +29,7 @@ export default function TestPanel() {
                 </div>
                 <div className="flex items-center gap-2">
                     <button className="px-3.5 py-1.5 rounded-md text-xs font-medium bg-forge-accent/15 text-forge-accent hover:bg-forge-accent/25 transition-colors flex items-center gap-2 cursor-pointer">
-                        <Icon d={icons.play} size={11} />
+                        <Icon d={GeneralIcons.play} size={11} />
                         Run All
                     </button>
                 </div>

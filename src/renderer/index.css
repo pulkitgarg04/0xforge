@@ -21,6 +21,22 @@
   --color-forge-info: #45b7d1;
 
   --spacing-sidebar: 52px;
+
+  --color-brand-dark: #0a0a0c;
+  --color-brand-glass: rgba(18, 18, 24, 0.85);
+  --color-brand-accent: #3b82f6;
+  --color-brand-border: rgba(255, 255, 255, 0.1);
+}
+
+.glass-card {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-brand-border);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.vibrant-gradient {
+  background: #000000;
 }
 
 *, *::before, *::after {
