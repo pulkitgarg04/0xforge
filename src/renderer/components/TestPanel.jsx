@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Icon from './Icon';
 import { sampleTestCases } from '../constants';
 import * as GeneralIcons from './icons/generalIcons';
@@ -7,8 +7,18 @@ export default function TestPanel() {
     const [activeTest, setActiveTest] = useState(1);
     const currentTest = sampleTestCases.find(t => t.id === activeTest);
 
+    useEffect(() => {
+        const unsubscribe = window.electronAPI.onMenuAction((action) => {
+            if (action === 'runTests' || action === 'runCode') {
+                console.log(`Executing ${action} from menu...`);
+                alert(`Executing ${action} (Not yet fully implemented)`);
+            }
+        });
+        return () => unsubscribe();
+    }, []);
+
     return (
-        <div className="h-60 bg-forge-surface border-t border-forge-border flex flex-col">
+        <div className="h-full bg-forge-surface flex flex-col">
             <div className="h-10 flex items-center justify-between px-5 border-b border-forge-border-subtle select-none">
                 <div className="flex items-center gap-4">
                     <span className="text-[11px] font-semibold text-forge-text-muted uppercase tracking-widest">Test Cases</span>

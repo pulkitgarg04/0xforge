@@ -7,3 +7,6 @@ export const chevronR = 'M9 18l6-6-6-6';
 export const flask = 'M9 3h6 M12 3v7.5 M5.5 21h13a1 1 0 0 0 .87-1.5l-5.87-10h-2l-5.87 10A1 1 0 0 0 5.5 21z';
 export const cpu = 'M6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M9 1v3 M15 1v3 M9 20v3 M15 20v3 M1 9h3 M1 15h3 M20 9h3 M20 15h3';
 export const circle = 'M12 12m-10 0a10 10 0 1 0 20 0a10 10 0 1 0-20 0';
+export const close = 'M18 6L6 18 M6 6l12 12';
+export const plus = 'M12 5v14 M5 12h14';
+export const splitHorizontal = 'M12 4v16 M4 4h16v16H4z';

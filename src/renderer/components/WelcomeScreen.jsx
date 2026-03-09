@@ -1,8 +1,56 @@
+import { useState } from 'react';
 import { PlusIcon, FolderIcon, GitIcon, CommandIcon, GearIcon, SparkleIcon, ExtensionIcon } from './icons';
 import { SectionHeader } from './welcome-screen/SectionHeader';
 import { WelcomeItem } from './welcome-screen/WelcomeItem';
 
-export default function WelcomeScreen({ onOpenFolder, onNewFile }) {
+export default function WelcomeScreen({ onOpenFolder, onNewFile, onCloneRepo }) {
+    const [showCloneInput, setShowCloneInput] = useState(false);
+    const [cloneUrl, setCloneUrl] = useState('');
+    const [cloning, setCloning] = useState(false);
+    const [gitMissing, setGitMissing] = useState(false);
+    const [installingGit, setInstallingGit] = useState(false);
+
+    const handleCloneClick = async () => {
+        const hasGit = await window.electronAPI.git.check();
+
+        if (!hasGit) {
+            setGitMissing(true);
+            setShowCloneInput(false);
+        } else {
+            setGitMissing(false);
+            setShowCloneInput(true);
+        }
+    };
+
+    const handleInstallGit = async () => {
+        setInstallingGit(true);
+
+        await window.electronAPI.git.install();
+        setInstallingGit(false);
+
+        const hasGit = await window.electronAPI.git.check();
+        if (hasGit) {
+            setGitMissing(false);
+            setShowCloneInput(true);
+        }
+    };
+
+    const handleClone = async () => {
+        if (!cloneUrl.trim()) return;
+
+        setCloning(true);
+
+        try {
+            await onCloneRepo(cloneUrl.trim());
+        } catch (e) {
+            // error handled by parent
+        }
+
+        setCloning(false);
+        setShowCloneInput(false);
+        setCloneUrl('');
+    };
+
     return (
         <div
             style={{
@@ -40,7 +88,101 @@ export default function WelcomeScreen({ onOpenFolder, onNewFile }) {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <WelcomeItem icon={<PlusIcon />} label="New File" shortcut="⌘ N" onClick={onNewFile} />
                         <WelcomeItem icon={<FolderIcon />} label="Open Project" shortcut="⌘ O" onClick={onOpenFolder} />
-                        <WelcomeItem icon={<GitIcon />} label="Clone Repository" />
+                        <WelcomeItem icon={<GitIcon />} label="Clone Repository" onClick={handleCloneClick} />
+
+                        {gitMissing && (
+                            <div style={{
+                                padding: '12px 16px',
+                                margin: '4px 0',
+                                borderRadius: '6px',
+                                backgroundColor: '#2a1f1a',
+                                border: '1px solid #3a3028',
+                            }}>
+                                <p style={{ fontSize: '13px', color: '#d4a85c', margin: '0 0 8px 0' }}>
+                                    ⚠ Git is not installed on your system
+                                </p>
+                                <p style={{ fontSize: '12px', color: '#a09080', margin: '0 0 12px 0' }}>
+                                    Git is required to clone repositories. Install it to continue.
+                                </p>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button
+                                        onClick={handleInstallGit}
+                                        disabled={installingGit}
+                                        style={{
+                                            padding: '6px 14px',
+                                            borderRadius: '6px',
+                                            border: 'none',
+                                            background: '#c8b89a',
+                                            color: '#1a1510',
+                                            fontSize: '12px',
+                                            fontWeight: 600,
+                                            cursor: installingGit ? 'wait' : 'pointer',
+                                        }}
+                                    >
+                                        {installingGit ? 'Installing...' : 'Install Git'}
+                                    </button>
+                                    <button
+                                        onClick={() => setGitMissing(false)}
+                                        style={{
+                                            padding: '6px 14px',
+                                            borderRadius: '6px',
+                                            border: '1px solid #3a3028',
+                                            background: 'transparent',
+                                            color: '#a09080',
+                                            fontSize: '12px',
+                                            cursor: 'pointer',
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {showCloneInput && (
+                            <div style={{ padding: '8px 16px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <input
+                                    autoFocus
+                                    type="text"
+                                    value={cloneUrl}
+                                    onChange={(e) => setCloneUrl(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleClone();
+                                        if (e.key === 'Escape') { setShowCloneInput(false); setCloneUrl(''); }
+                                    }}
+                                    placeholder="https://github.com/pulkitgarg04/repo.git"
+                                    disabled={cloning}
+                                    style={{
+                                        flex: 1,
+                                        padding: '8px 12px',
+                                        borderRadius: '6px',
+                                        border: '1px solid #3a3028',
+                                        background: '#1a1510',
+                                        color: '#e8dcc8',
+                                        fontSize: '13px',
+                                        fontFamily: "'Menlo', monospace",
+                                        outline: 'none',
+                                    }}
+                                />
+                                <button
+                                    onClick={handleClone}
+                                    disabled={cloning || !cloneUrl.trim()}
+                                    style={{
+                                        padding: '8px 16px',
+                                        borderRadius: '6px',
+                                        border: 'none',
+                                        background: cloning ? '#3a3028' : '#c8b89a',
+                                        color: cloning ? '#a09080' : '#1a1510',
+                                        fontSize: '12px',
+                                        fontWeight: 600,
+                                        cursor: cloning ? 'wait' : 'pointer',
+                                    }}
+                                >
+                                    {cloning ? 'Cloning...' : 'Clone'}
+                                </button>
+                            </div>
+                        )}
+
                         <WelcomeItem icon={<CommandIcon />} label="Open Command Palette" shortcut="⌘ ⇧ P" />
                     </div>
                 </div>

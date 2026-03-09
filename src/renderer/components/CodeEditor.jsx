@@ -93,6 +93,64 @@ export default function CodeEditor({ openFiles, activeFile, onSwitchFile, onClos
         editorRef.current = editor;
         monacoRef.current = monaco;
 
+        monaco.editor.defineTheme('forge-dark', {
+            base: 'vs-dark',
+            inherit: true,
+            rules: [
+                { token: '', foreground: 'e8dcc8', background: '1a1510' },
+                { token: 'comment', foreground: '6e6050', fontStyle: 'italic' },
+                { token: 'keyword', foreground: 'c8b89a' },
+                { token: 'keyword.control', foreground: 'c8b89a' },
+                { token: 'storage', foreground: 'c8b89a' },
+                { token: 'storage.type', foreground: 'c8b89a' },
+                { token: 'string', foreground: '7eb87a' },
+                { token: 'string.escape', foreground: 'a0d49c' },
+                { token: 'number', foreground: 'd4a85c' },
+                { token: 'constant', foreground: 'd4a85c' },
+                { token: 'type', foreground: '7aacb8' },
+                { token: 'type.identifier', foreground: '7aacb8' },
+                { token: 'class', foreground: '7aacb8' },
+                { token: 'function', foreground: 'd8c8aa' },
+                { token: 'function.declaration', foreground: 'd8c8aa' },
+                { token: 'variable', foreground: 'e8dcc8' },
+                { token: 'variable.predefined', foreground: 'd4a85c' },
+                { token: 'operator', foreground: 'a09080' },
+                { token: 'delimiter', foreground: 'a09080' },
+                { token: 'delimiter.bracket', foreground: 'a09080' },
+                { token: 'tag', foreground: 'd47272' },
+                { token: 'attribute.name', foreground: 'c8b89a' },
+                { token: 'attribute.value', foreground: '7eb87a' },
+                { token: 'identifier', foreground: 'e8dcc8' },
+                { token: 'namespace', foreground: '7aacb8' },
+                { token: 'preprocessor', foreground: 'b88aad' },
+            ],
+            colors: {
+                'editor.background': '#1a1510',
+                'editor.foreground': '#e8dcc8',
+                'editor.lineHighlightBackground': '#231d1980',
+                'editor.selectionBackground': '#c8b89a30',
+                'editor.inactiveSelectionBackground': '#c8b89a15',
+                'editorCursor.foreground': '#c8b89a',
+                'editorLineNumber.foreground': '#6e6050',
+                'editorLineNumber.activeForeground': '#a09080',
+                'editorIndentGuide.background': '#2a221940',
+                'editorIndentGuide.activeBackground': '#3a302880',
+                'editorBracketMatch.background': '#c8b89a20',
+                'editorBracketMatch.border': '#c8b89a40',
+                'editorWidget.background': '#231d19',
+                'editorWidget.border': '#3a3028',
+                'editorSuggestWidget.background': '#231d19',
+                'editorSuggestWidget.border': '#3a3028',
+                'editorSuggestWidget.selectedBackground': '#2e2620',
+                'editorGutter.background': '#1a1510',
+                'scrollbar.shadow': '#00000000',
+                'scrollbarSlider.background': '#3a302860',
+                'scrollbarSlider.hoverBackground': '#3a302890',
+                'scrollbarSlider.activeBackground': '#3a3028b0',
+            },
+        });
+        monaco.editor.setTheme('forge-dark');
+
         if (activeFile && fileContentsRef.current[activeFile] !== undefined) {
             const uri = monaco.Uri.parse(`file://${activeFile}`);
             let model = monaco.editor.getModel(uri);
@@ -125,6 +183,19 @@ export default function CodeEditor({ openFiles, activeFile, onSwitchFile, onClos
         }
     }, [activeFile, modified, onFileSaved]);
 
+    const handleSaveAll = useCallback(async () => {
+        const promises = Object.keys(modified).map(async (filePath) => {
+            if (modified[filePath]) {
+                const success = await window.electronAPI.writeFile(filePath, fileContentsRef.current[filePath]);
+                if (success) {
+                    setModified((prev) => ({ ...prev, [filePath]: false }));
+                    if (onFileSaved) onFileSaved(filePath);
+                }
+            }
+        });
+        await Promise.all(promises);
+    }, [modified, onFileSaved]);
+
     useEffect(() => {
         const handler = (e) => {
             if ((e.metaKey || e.ctrlKey) && e.key === 's') {
@@ -133,8 +204,38 @@ export default function CodeEditor({ openFiles, activeFile, onSwitchFile, onClos
             }
         };
         window.addEventListener('keydown', handler);
-        return () => window.removeEventListener('keydown', handler);
-    }, [handleSave]);
+
+        const unsubscribeMenu = window.electronAPI.onMenuAction((action) => {
+            if (action === 'save') handleSave();
+            if (action === 'saveAll') handleSaveAll();
+
+            if (!editorRef.current) return;
+            const editor = editorRef.current;
+
+            switch (action) {
+                case 'expandSelection':
+                    editor.trigger('menu', 'editor.action.smartSelect.expand');
+                    break;
+                case 'shrinkSelection':
+                    editor.trigger('menu', 'editor.action.smartSelect.shrink');
+                    break;
+                case 'goToFile':
+                    editor.trigger('menu', 'editor.action.quickCommand');
+                    break;
+                case 'goToSymbol':
+                    editor.trigger('menu', 'editor.action.gotoSymbol');
+                    break;
+                case 'goToLine':
+                    editor.trigger('menu', 'editor.action.gotoLine');
+                    break;
+            }
+        });
+
+        return () => {
+            window.removeEventListener('keydown', handler);
+            unsubscribeMenu();
+        };
+    }, [handleSave, handleSaveAll]);
 
     const handleClose = (e, filePath) => {
         e.stopPropagation();
@@ -198,15 +299,15 @@ export default function CodeEditor({ openFiles, activeFile, onSwitchFile, onClos
                     defaultLanguage="plaintext"
                     defaultValue=""
                     onMount={handleEditorMount}
-                    theme="vs-dark"
+                    theme="forge-dark"
                     loading={
                         <div className="flex-1 flex items-center justify-center bg-forge-bg">
                             <p className="text-sm text-forge-text-dim">Loading editor...</p>
                         </div>
                     }
                     options={{
-                        fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-                        fontSize: 14,
+                        fontFamily: "'Menlo', 'Monaco', 'Courier New', monospace",
+                        fontSize: 13,
                         lineHeight: 22,
                         minimap: { enabled: false },
                         scrollBeyondLastLine: false,

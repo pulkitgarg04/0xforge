@@ -11,7 +11,7 @@ export default function StatusBar({ workspacePath, activeFile }) {
         html: 'HTML', css: 'CSS', json: 'JSON',
         md: 'Markdown', sh: 'Shell', txt: 'Plain Text',
     };
-    const language = langMap[ext] || ext.toUpperCase() || '—';
+    const language = langMap[ext] || ext.toUpperCase() || '-';
 
     return (
         <footer className="h-7 flex items-center justify-between px-5 bg-forge-surface border-t border-forge-border-subtle text-[11px] text-forge-text-dim select-none">
@@ -20,7 +20,7 @@ export default function StatusBar({ workspacePath, activeFile }) {
                     <span className="w-[7px] h-[7px] rounded-full bg-forge-success" />
                     Ready
                 </span>
-                {language !== '—' && <span>{language}</span>}
+                {language !== '-' && <span>{language}</span>}
                 <span>UTF-8</span>
             </div>
             <div className="flex items-center gap-5">

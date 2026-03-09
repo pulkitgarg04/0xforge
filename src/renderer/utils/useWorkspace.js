@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 export function useWorkspace() {
     const [workspacePath, setWorkspacePath] = useState(null);
@@ -11,6 +11,24 @@ export function useWorkspace() {
             setWorkspacePath(folderPath);
             setOpenFiles([]);
             setActiveFile(null);
+        }
+    }, []);
+
+    const handleCloneRepo = useCallback(async (repoUrl) => {
+        if (!repoUrl || !repoUrl.trim()) return;
+
+        const destDir = await window.electronAPI.openFolder();
+        if (!destDir) return;
+
+        try {
+            const clonedPath = await window.electronAPI.git.clone(repoUrl.trim(), destDir);
+            if (clonedPath) {
+                setWorkspacePath(clonedPath);
+                setOpenFiles([]);
+                setActiveFile(null);
+            }
+        } catch (err) {
+            window.alert(`Clone failed: ${err}`);
         }
     }, []);
 
@@ -51,6 +69,34 @@ export function useWorkspace() {
         });
     }, [activeFile]);
 
+    useEffect(() => {
+        const unsubscribe = window.electronAPI.onMenuAction((action, ...args) => {
+            switch (action) {
+                case 'newFile':
+                    handleNewFile();
+                    break;
+                case 'openFolder':
+                    if (args[0]) {
+                        setWorkspacePath(args[0]);
+                        setOpenFiles([]);
+                        setActiveFile(null);
+                    }
+                    break;
+                case 'closeEditor':
+                    if (activeFile) {
+                        handleCloseFile(activeFile);
+                    }
+                    break;
+                case 'closeFolder':
+                    setWorkspacePath(null);
+                    setOpenFiles([]);
+                    setActiveFile(null);
+                    break;
+            }
+        });
+        return () => unsubscribe();
+    }, [handleNewFile, handleCloseFile, activeFile]);
+
     const showWelcome = !workspacePath;
     const activeFileName = activeFile ? activeFile.split('/').pop() : '';
 
@@ -62,6 +108,7 @@ export function useWorkspace() {
         showWelcome,
         handleOpenFolder,
         handleNewFile,
+        handleCloneRepo,
         handleFileOpen,
         handleSwitchFile,
         handleCloseFile,
