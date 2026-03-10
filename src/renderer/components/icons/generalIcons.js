@@ -10,3 +10,5 @@ export const circle = 'M12 12m-10 0a10 10 0 1 0 20 0a10 10 0 1 0-20 0';
 export const close = 'M18 6L6 18 M6 6l12 12';
 export const plus = 'M12 5v14 M5 12h14';
 export const splitHorizontal = 'M12 4v16 M4 4h16v16H4z';
+export const code = 'M16 18l6-6-6-6 M8 6l-6 6 6 6';
+export const folder = 'M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z';

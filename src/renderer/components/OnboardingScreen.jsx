@@ -16,6 +16,7 @@ export default function OnboardingScreen({ onComplete }) {
 
         setSubmitting(true);
         await window.electronAPI.setStore('userProfile', formData);
+        await window.electronAPI.setStore('preferredLanguage', formData.language);
         onComplete(formData);
     };
 

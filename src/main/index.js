@@ -7,6 +7,7 @@ const { setupDialogHandlers } = require('./dialogs');
 const { setupFileSystemHandlers } = require('./fileSystem');
 const { setupGitHandlers } = require('./git');
 const { setupStoreHandlers } = require('./store');
+const { setupCodeforcesHandlers } = require('./codeforces');
 
 app.name = '0xForge';
 
@@ -27,6 +28,7 @@ const createWindow = () => {
       nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js'),
+      webviewTag: true,
     },
     show: false,
   });
@@ -46,6 +48,7 @@ setupDialogHandlers(getMainWindow);
 setupFileSystemHandlers();
 setupGitHandlers(getMainWindow);
 setupStoreHandlers();
+setupCodeforcesHandlers();
 
 app.whenReady().then(() => {
   setupAppMenu(createWindow);

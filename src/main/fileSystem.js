@@ -74,6 +74,10 @@ function setupFileSystemHandlers() {
             return false;
         }
     });
+
+    ipcMain.handle('fs:pathJoin', async (_event, ...args) => {
+        return path.join(...args);
+    });
 }
 
 module.exports = { setupFileSystemHandlers };

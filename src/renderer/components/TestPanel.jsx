@@ -1,11 +1,18 @@
 import { useState, useEffect } from 'react';
 import Icon from './Icon';
-import { sampleTestCases } from '../constants';
+import { sampleTestCases as defaultTestCases } from '../constants';
 import * as GeneralIcons from './icons/generalIcons';
 
-export default function TestPanel() {
+export default function TestPanel({ testCases = defaultTestCases }) {
     const [activeTest, setActiveTest] = useState(1);
-    const currentTest = sampleTestCases.find(t => t.id === activeTest);
+
+    useEffect(() => {
+        if (testCases && testCases.length > 0) {
+            setActiveTest(testCases[0].id);
+        }
+    }, [testCases]);
+
+    const currentTest = testCases.find(t => t.id === activeTest) || testCases[0];
 
     useEffect(() => {
         const unsubscribe = window.electronAPI.onMenuAction((action) => {
@@ -23,7 +30,7 @@ export default function TestPanel() {
                 <div className="flex items-center gap-4">
                     <span className="text-[11px] font-semibold text-forge-text-muted uppercase tracking-widest">Test Cases</span>
                     <div className="flex gap-1">
-                        {sampleTestCases.map((tc) => (
+                        {testCases.map((tc) => (
                             <button key={tc.id} onClick={() => setActiveTest(tc.id)}
                                 className={`px-3 py-1 rounded-md text-xs font-medium transition-all cursor-pointer
                                     ${activeTest === tc.id

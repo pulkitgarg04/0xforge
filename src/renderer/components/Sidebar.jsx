@@ -5,6 +5,7 @@ export default function Sidebar({ active, onSelect, onOpenFolder }) {
     const items = [
         { key: 'files', icon: GeneralIcons.files, label: 'Explorer' },
         { key: 'search', icon: GeneralIcons.search, label: 'Search' },
+        { key: 'codeforces', icon: GeneralIcons.code, label: 'Codeforces' },
         { key: 'testing', icon: GeneralIcons.flask, label: 'Test Cases' },
         { key: 'terminal', icon: GeneralIcons.terminal, label: 'Terminal' },
     ];

@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     createFile: (filePath) => ipcRenderer.invoke('fs:createFile', filePath),
     createFolder: (dirPath) => ipcRenderer.invoke('fs:createFolder', dirPath),
     deleteFile: (filePath) => ipcRenderer.invoke('fs:deleteFile', filePath),
+    pathJoin: (...args) => ipcRenderer.invoke('fs:pathJoin', ...args),
     getStore: (key) => ipcRenderer.invoke('store:get', key),
     setStore: (key, value) => ipcRenderer.invoke('store:set', key, value),
     onMenuAction: (callback) => {
@@ -41,5 +42,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
             ipcRenderer.on('git:clone:progress', handler);
             return () => ipcRenderer.removeListener('git:clone:progress', handler);
         }
+    },
+    codeforces: {
+        fetchProblem: (problemId) => ipcRenderer.invoke('codeforces:fetchProblem', problemId)
     }
 });
